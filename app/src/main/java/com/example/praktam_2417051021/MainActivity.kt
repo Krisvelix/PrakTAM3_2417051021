@@ -1,5 +1,15 @@
 package com.example.praktam_2417051021
 
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.example.praktam_2417051021.model.GlowUpSource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.praktam_2417051021.ui.theme.PrakTAM_2417051021Theme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.unit.dp
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +34,6 @@ class MainActivity : ComponentActivity() {
             PrakTAM_2417051021Theme {
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
                     Greeting(
-                        name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -31,17 +43,56 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello, saya Krisvelix William dengan NMP 2417051021 siap belajar Compose!",
-        modifier = modifier
-    )
+fun Greeting(modifier: Modifier = Modifier) {
+
+    Column(modifier = modifier.padding(16.dp)) {
+
+        Text(
+            text = "✨ Glow Up Tracker ✨",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        GlowUpSource.dummyGlowUp.forEach { glow ->
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Image(
+                        painter = painterResource(id = glow.imageRes),
+                        contentDescription = glow.nama,
+                        modifier = Modifier.size(120.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = glow.nama,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(text = glow.deskripsi)
+                }
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     PrakTAM_2417051021Theme {
-        Greeting("Android")
+        Greeting()
     }
 }
