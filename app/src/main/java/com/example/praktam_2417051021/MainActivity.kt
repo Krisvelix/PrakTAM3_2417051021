@@ -1,98 +1,98 @@
 package com.example.praktam_2417051021
 
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import com.example.praktam_2417051021.model.GlowUpSource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.praktam_2417051021.ui.theme.PrakTAM_2417051021Theme
-import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-
+import com.example.praktam_2417051021.model.GlowUp
+import com.example.praktam_2417051021.model.GlowUpSource
+import com.example.praktam_2417051021.ui.theme.PrakTAM_2417051021Theme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             PrakTAM_2417051021Theme {
-                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    Greeting(
+
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
+                    GlowUpScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
+
                 }
+
             }
         }
     }
 }
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier) {
+fun GlowUpScreen(modifier: Modifier = Modifier) {
 
-    Column(modifier = modifier.padding(16.dp)) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize()
+    ) {
 
-        Text(
-            text = "✨ Glow Up Tracker ✨",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
-        )
+        items(GlowUpSource.glowUpList) { item ->
 
-        Spacer(modifier = Modifier.height(16.dp))
+            GlowUpItem(glowUp = item)
 
-        GlowUpSource.dummyGlowUp.forEach { glow ->
+        }
 
-            Card(
+    }
+
+}
+
+@Composable
+fun GlowUpItem(glowUp: GlowUp) {
+
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Image(
+                painter = painterResource(id = glowUp.imageRes),
+                contentDescription = glowUp.nama,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-            ) {
+                    .size(120.dp)
+                    .padding(bottom = 8.dp)
+            )
 
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+            Text(text = glowUp.nama)
 
-                    Image(
-                        painter = painterResource(id = glow.imageRes),
-                        contentDescription = glow.nama,
-                        modifier = Modifier.size(120.dp)
-                    )
+            Text(
+                text = glowUp.deskripsi,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = glow.nama,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(text = glow.deskripsi)
-                }
+            Button(onClick = { }) {
+                Text("Start")
             }
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PrakTAM_2417051021Theme {
-        Greeting()
+        }
+
     }
+
 }
