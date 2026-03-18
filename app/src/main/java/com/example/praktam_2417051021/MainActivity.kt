@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -48,17 +48,16 @@ fun GlowUpScreen(modifier: Modifier = Modifier) {
     ) {
 
         items(GlowUpSource.glowUpList) { item ->
-
             GlowUpItem(glowUp = item)
-
         }
 
     }
-
 }
 
 @Composable
 fun GlowUpItem(glowUp: GlowUp) {
+
+    var isStarted by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -87,12 +86,19 @@ fun GlowUpItem(glowUp: GlowUp) {
                 modifier = Modifier.padding(vertical = 4.dp)
             )
 
-            Button(onClick = { }) {
-                Text("Start")
+            Button(
+                onClick = { isStarted = !isStarted },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isStarted)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Text(if (isStarted) "Done" else "Start")
             }
 
         }
 
     }
-
 }
