@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,15 +45,60 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GlowUpScreen(modifier: Modifier = Modifier) {
 
-    LazyColumn(
+    Column(
         modifier = modifier.fillMaxSize()
     ) {
 
-        items(GlowUpSource.glowUpList) { item ->
-            GlowUpItem(glowUp = item)
+        // 🔹 LazyRow (Horizontal List)
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+
+            items(GlowUpSource.glowUpList) { item ->
+
+                Card(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(120.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Image(
+                            painter = painterResource(id = item.imageRes),
+                            contentDescription = item.nama,
+                            modifier = Modifier.size(60.dp)
+                        )
+
+                        Text(text = item.nama)
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        // 🔹 LazyColumn (Vertical List)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            items(GlowUpSource.glowUpList) { item ->
+                GlowUpItem(glowUp = item)
+            }
+
         }
 
     }
+
 }
 
 @Composable
