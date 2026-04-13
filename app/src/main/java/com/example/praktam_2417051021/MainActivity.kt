@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.example.praktam_2417051021.model.GlowUp
 import com.example.praktam_2417051021.model.GlowUpSource
 import com.example.praktam_2417051021.ui.theme.PrakTAM_2417051021Theme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -30,11 +31,7 @@ class MainActivity : ComponentActivity() {
             PrakTAM_2417051021Theme {
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    GlowUpScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-
+                    GlowUpScreen(modifier = Modifier.padding(innerPadding))
                 }
 
             }
@@ -45,11 +42,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GlowUpScreen(modifier: Modifier = Modifier) {
 
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
+    Column(modifier = modifier.fillMaxSize()) {
 
-        // 🔹 LazyRow (Horizontal List)
+        // LazyRow (list horizontal)
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,7 +81,7 @@ fun GlowUpScreen(modifier: Modifier = Modifier) {
 
         }
 
-        // 🔹 LazyColumn (Vertical List)
+        // LazyColumn (list vertical)
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -98,54 +93,92 @@ fun GlowUpScreen(modifier: Modifier = Modifier) {
         }
 
     }
-
 }
 
 @Composable
 fun GlowUpItem(glowUp: GlowUp) {
 
-    var isStarted by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Card(
+    Box(
         modifier = Modifier
+            .fillMaxWidth()
             .padding(8.dp)
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
     ) {
 
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
 
-            Image(
-                painter = painterResource(id = glowUp.imageRes),
-                contentDescription = glowUp.nama,
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(bottom = 8.dp)
-            )
-
-            Text(text = glowUp.nama)
-
-            Text(
-                text = glowUp.deskripsi,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-
-            Button(
-                onClick = { isStarted = !isStarted },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isStarted)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.secondary
-                )
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(if (isStarted) "Done" else "Start")
+
+                Image(
+                    painter = painterResource(id = glowUp.imageRes),
+                    contentDescription = glowUp.nama,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(bottom = 8.dp)
+                )
+
+                Text(text = glowUp.nama)
+
+                Text(
+                    text = glowUp.deskripsi,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+
+                            isLoading = true
+
+                            delay(2000)
+
+                            snackbarHostState.showSnackbar(
+                                "${glowUp.nama} berhasil diproses!"
+                            )
+
+                            isLoading = false
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading
+                ) {
+
+                    if (isLoading) {
+
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text("Memproses...")
+
+                    } else {
+
+                        Text("Start")
+
+                    }
+
+                }
+
             }
 
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
 
     }
 }
