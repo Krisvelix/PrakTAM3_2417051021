@@ -30,7 +30,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             PrakTAM_2417051021Theme {
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
                     GlowUpScreen(modifier = Modifier.padding(innerPadding))
                 }
 
@@ -44,13 +46,12 @@ fun GlowUpScreen(modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.fillMaxSize()) {
 
-        // LazyRow (list horizontal)
+        // 🔹 LazyRow
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-
             items(GlowUpSource.glowUpList) { item ->
 
                 Card(
@@ -78,18 +79,15 @@ fun GlowUpScreen(modifier: Modifier = Modifier) {
                 }
 
             }
-
         }
 
-        // LazyColumn (list vertical)
+        // 🔹 LazyColumn
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-
             items(GlowUpSource.glowUpList) { item ->
                 GlowUpItem(glowUp = item)
             }
-
         }
 
     }
@@ -153,7 +151,6 @@ fun GlowUpItem(glowUp: GlowUp) {
                 ) {
 
                     if (isLoading) {
-
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
                             strokeWidth = 2.dp
@@ -162,11 +159,8 @@ fun GlowUpItem(glowUp: GlowUp) {
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text("Memproses...")
-
                     } else {
-
                         Text("Start")
-
                     }
 
                 }
