@@ -4,17 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.example.praktam_2417051021.data.model.GlowUp
-import com.example.praktam_2417051021.data.repository.GlowUpRepository
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.praktam_2417051021.datastore.UserPreferences
+import com.example.praktam_2417051021.screen.*
+import screen.fiturutama.RegisterScreen
+import screen.fiturutama.LoginScreen
+import screen.fiturutama.ForgotPasswordScreen
+import screen.fiturutama.EditProfileScreen
+import screen.fiturutama.ChangePasswordScreen
+import screen.profile.ProfileScreen
 import com.example.praktam_2417051021.ui.theme.PrakTAM_2417051021Theme
 
 class MainActivity : ComponentActivity() {
@@ -24,151 +29,185 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-
             PrakTAM_2417051021Theme {
-
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-
-                    GlowUpScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-
-                }
-
+                GlowUpApp()
             }
-
         }
     }
 }
 
 @Composable
-fun GlowUpScreen(modifier: Modifier = Modifier) {
+fun GlowUpApp() {
 
-    val repository = remember { GlowUpRepository() }
+    val navController = rememberNavController()
 
-    var glowUps by remember {
-        mutableStateOf<List<GlowUp>>(emptyList())
-    }
+    // IMPORTANT: satu instance UserPreferences
+    val userPreferences = UserPreferences(
+        context = androidx.compose.ui.platform.LocalContext.current
+    )
 
-    var isLoading by remember {
-        mutableStateOf(true)
-    }
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
 
-    var isError by remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(Unit) {
-
-        try {
-
-            glowUps = repository.getGlowUp()
-
-            isError = glowUps.isEmpty()
-
-        } catch (e: Exception) {
-
-            isError = true
-
-        }
-
-        isLoading = false
-
-    }
-
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-
-        when {
-
-            isLoading -> {
-
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-
-            }
-
-            isError -> {
-
-                Text(
-                    text = "Gagal memuat data, periksa koneksi internet",
-                    modifier = Modifier.align(Alignment.Center)
-                )
-
-            }
-
-            else -> {
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-
-                    items(glowUps) { item ->
-
-                        GlowUpItem(glowUp = item)
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-
-}
-
-@Composable
-fun GlowUpItem(glowUp: GlowUp) {
-
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        NavHost(
+            navController = navController,
+            startDestination = "splash",
+            modifier = Modifier.padding(innerPadding)
         ) {
 
-            AsyncImage(
-                model = glowUp.image_url,
-                contentDescription = glowUp.nama,
+            composable("splash") {
+                SplashScreen(
+                    onNavigateToLogin = {
+                        navController.navigate("login") {
+                            popUpTo("splash") { inclusive = true }
+                        }
+                    }
+                )
+            }
 
-                modifier = Modifier
-                    .size(150.dp)
-                    .padding(bottom = 8.dp)
-            )
+            composable("login") {
+                LoginScreen(
+                    onLoginSuccess = { navController.navigate("home") },
+                    onRegisterClick = { navController.navigate("register") },
+                    onForgotClick = { navController.navigate("forgot") }
+                )
+            }
 
-            Text(
-                text = glowUp.nama,
-                style = MaterialTheme.typography.titleMedium
-            )
+            composable("register") {
+                RegisterScreen(
+                    onRegisterSuccess = { navController.popBackStack() },
+                    onBackToLogin = { navController.popBackStack() }
+                )
+            }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            composable("forgot") {
+                ForgotPasswordScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
 
-            Text(
-                text = glowUp.deskripsi,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            composable("home") {
+                HomeScreen(navController)
+            }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            composable("profile") {
+                ProfileScreen(navController, userPreferences)
+            }
 
-            Text(
-                text = "Harga: Rp ${glowUp.harga}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            composable("edit_profile") {
+                EditProfileScreen(navController, userPreferences)
+            }
 
+            composable("change_password") {
+                ChangePasswordScreen(navController, userPreferences)
+            }
+
+            // ================= WORKOUT =================
+            composable("workout_detail") {
+                WorkoutDetailScreen(navController)
+            }
+
+            composable("progress") {
+                ProgressScreen(navController)
+            }
+
+            composable("history") {
+                HistoryScreen(navController)
+            }
+
+            // ================= SELF CARE =================
+            composable("selfcare_detail") {
+                SelfCareDetailScreen(navController)
+            }
+
+            composable("selfcare_progress") {
+                SelfCareProgressScreen(navController)
+            }
+
+            composable("selfcare_history") {
+                SelfCareHistoryScreen(navController)
+            }
+
+            // ================= JOURNAL =================
+            composable("journal_detail") {
+                JournalDetailScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+
+            composable("journal_progress") {
+                JournalProgressScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+
+            composable("journal_history") {
+                JournalHistoryScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+
+            // ================= SKINCARE =================
+            composable("skincare_detail") {
+                SkincareRoutineScreen(
+                    navController = navController,
+                    skinType = "Oily (Berminyak)",
+                    userPreferences = userPreferences
+                )
+            }
+
+            composable("skincare_progress") {
+                SkincareProgressScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+
+            composable("skincare_history") {
+                SkincareHistoryScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+            composable("skincare_type") {
+                SkincareTypeScreen(navController)
+            }
+
+            composable("skincare_detail/{skinType}") { backStack ->
+                val skinType = backStack.arguments?.getString("skinType") ?: ""
+
+                SkincareRoutineScreen(
+                    navController = navController,
+                    skinType = skinType,
+                    userPreferences = userPreferences
+                )
+            }
+
+            // ================= HYDRATION =================
+            composable("hydration_routine") {
+                HydrationRoutineScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+
+            composable("hydration_history") {
+                HydrationHistoryScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
+
+            composable("hydration_progress") {
+                HydrationProgressScreen(
+                    navController = navController,
+                    userPreferences = userPreferences
+                )
+            }
         }
-
     }
-
 }

@@ -5,19 +5,16 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val LightColors = lightColorScheme(
-
     primary = PurplePrimary,
     secondary = PurpleSecondary,
     background = BackgroundColor,
     surface = CardColor
-
 )
 
 @Composable
 fun PrakTAM_2417051021Theme(
     content: @Composable () -> Unit
 ) {
-
     MaterialTheme(
         colorScheme = LightColors,
         typography = AppTypography,
